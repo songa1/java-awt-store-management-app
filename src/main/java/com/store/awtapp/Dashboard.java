@@ -9,6 +9,7 @@ package com.store.awtapp;
  * @author CISHAHAYO
  */
 public class Dashboard extends javax.swing.JFrame {
+    
 
     /**
      * Creates new form Dashboard
@@ -37,6 +38,8 @@ public class Dashboard extends javax.swing.JFrame {
         menu3 = new java.awt.Menu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        tableHolder = new javax.swing.JScrollPane();
+        itemsTable = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         file = new javax.swing.JMenu();
         stockInMenu = new javax.swing.JMenu();
@@ -62,6 +65,16 @@ public class Dashboard extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        itemsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        tableHolder.setViewportView(itemsTable);
 
         file.setText("Items");
         jMenuBar1.add(file);
@@ -89,11 +102,17 @@ public class Dashboard extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1280, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(94, 94, 94)
+                .addComponent(tableHolder, javax.swing.GroupLayout.PREFERRED_SIZE, 1100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(86, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 697, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tableHolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(264, Short.MAX_VALUE))
         );
 
         pack();
@@ -103,7 +122,29 @@ public class Dashboard extends javax.swing.JFrame {
     private void ops(String c){
         companyName.setText("Company: " + c);
         userName.setText("Username");
+        
+        itemsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {"Burger", "12", "Techinika"},
+                {"Spaghetti", "12", "Techinika"},
+                {"Burger", "12", "Techinika"},
+                {"Spaghetti", "12", "Techinika"}
+            },
+            new String [] {
+                "Item Name", "User Id", "Company"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+
+            @Override
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
     }
+    
     
     /**
      * @param args the command line arguments
@@ -114,6 +155,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JMenu currentStockLink;
     private javax.swing.JMenu file;
     private javax.swing.JMenu inStockLink;
+    private javax.swing.JTable itemsTable;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -124,6 +166,7 @@ public class Dashboard extends javax.swing.JFrame {
     private java.awt.MenuBar menuBar2;
     private javax.swing.JMenu outStockLink;
     private javax.swing.JMenu stockInMenu;
+    private javax.swing.JScrollPane tableHolder;
     private javax.swing.JMenu userName;
     // End of variables declaration//GEN-END:variables
 }
