@@ -4,17 +4,18 @@
  */
 package com.store.awtapp;
 
+import java.sql.*;
+import java.util.HashMap;
+
 /**
  *
  * @author CISHAHAYO
  */
 public class Login extends javax.swing.JFrame {
     
-    String email = "songa@email.com";
-    String password = "admin@123";
-    String feedback;
+    HashMap<String, Integer> companies = new HashMap<>();
     
-    String[] companies = {"Techinika", "Airtel", "Etite", "MTN", "RwandaTel", "Tigo", "BAG"};
+    String feedback;
 
     /**
      * Creates new form Login
@@ -22,6 +23,25 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
         editHolders();
+        setValues();
+    }
+    
+    public final void setValues(){
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn;
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store", "root", "");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery( "select * from company" );
+            while(rs.next()){
+                System.out.println(rs.getString(2));
+                selectCompany.addItem(rs.getString(2));
+                companies.put( rs.getString(2), rs.getInt(1) );
+            }
+            conn.close();
+        }catch(ClassNotFoundException | SQLException e){
+            System.out.println(e);
+        }
     }
 
     /**
@@ -114,16 +134,37 @@ public class Login extends javax.swing.JFrame {
 
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
         // TODO add your handling code here:
-        if(emailField.getText().isEmpty() || passField.getText().isEmpty()){
-            msgLabel.setText("Credentials can not be empty!");
-        }else if(emailField.getText().equals(email) && passField.getText().equals(password)){
-            new Dashboard(emailField.getText(), passField.getText(), selectCompany.getSelectedItem()).setVisible(true);
-            msgLabel.setText("");
-            emailField.setText("");
-            passField.setText("");
-        }else{
-            msgLabel.setText("Email or Password provided is wrong!");
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn;
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store", "root", "");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery( "select * from users" );
+            
+            
+            while(rs.next()){
+                if(companies.get(selectCompany.getSelectedItem()) != rs.getInt(5)){
+                    msgLabel.setText("Select the right company!");
+                }else{
+                    if(emailField.getText().isEmpty() || passField.getText().isEmpty()){
+                        msgLabel.setText("Credentials can not be empty!");
+                    }else if(emailField.getText().equals(rs.getString(3)) && passField.getText().equals(rs.getString(4))){
+                        new Dashboard(rs.getString(7), selectCompany.getSelectedItem(), rs.getInt(5)).setVisible(true);
+                        msgLabel.setText("");
+                        emailField.setText("");
+                        passField.setText("");
+                        setVisible(false);
+                    }else{
+                        msgLabel.setText("Email or Password provided is wrong!");
+                        System.out.println("Failed");
+                    }    
+                }
+            }
+            conn.close();
+        }catch(ClassNotFoundException | SQLException e){
+            System.out.println(e);
         }
+        
         
     }//GEN-LAST:event_loginBtnActionPerformed
 
@@ -136,11 +177,6 @@ public class Login extends javax.swing.JFrame {
      */
     
     private void editHolders(){
-        for (String companie : companies) {
-            selectCompany.addItem(companie);
-        }
-        
-        
         passField.setEchoChar('*');
     }
     

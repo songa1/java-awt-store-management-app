@@ -4,6 +4,8 @@
  */
 package com.store.awtapp;
 
+import java.sql.*;
+
 /**
  *
  * @author CISHAHAYO
@@ -13,13 +15,30 @@ public class Dashboard extends javax.swing.JFrame {
 
     /**
      * Creates new form Dashboard
-     * @param email
-     * @param password
+     * @param name
      * @param company
+     * @param companyId
      */
-    public Dashboard(String email, String password, String company) {
+    public Dashboard(String name, String company, int companyId) {
         initComponents();
-        ops(company);
+        fetchData(companyId);
+        ops(company, name);
+    }
+    
+    public final void fetchData(int companyId){
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn;
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store", "root", "");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery( "select * from items where companyId="+companyId );
+            while(rs.next()){
+                System.out.println(rs.getString(2));
+            }
+            conn.close();
+        }catch(ClassNotFoundException | SQLException e){
+            System.out.println(e);
+        }
     }
 
     /**
@@ -119,9 +138,9 @@ public class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     
-    private void ops(String c){
+    private void ops(String c, String name){
         companyName.setText("Company: " + c);
-        userName.setText("Username");
+        userName.setText(name);
         
         itemsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
