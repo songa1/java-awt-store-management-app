@@ -4,7 +4,11 @@
  */
 package com.store.awtapp;
 
+import java.awt.Component;
 import java.sql.*;
+import java.time.format.DateTimeFormatter;  
+import java.time.LocalDateTime;    
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -12,33 +16,62 @@ import java.sql.*;
  */
 public class Dashboard extends javax.swing.JFrame {
     
+    
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+    LocalDateTime now = LocalDateTime.now();  
+    
+    int companyId;
+    int userId = 1;
 
     /**
      * Creates new form Dashboard
+     * @param userId
      * @param name
      * @param company
      * @param companyId
      */
-    public Dashboard(String name, String company, int companyId) {
+    public Dashboard(int userId, String name, String company, int companyId) {
+        this.companyId = companyId;
         initComponents();
-        fetchData(companyId);
+        fetchData();
         ops(company, name);
     }
     
-    public final void fetchData(int companyId){
+    public final void fetchData(){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection conn;
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store", "root", "");
             Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery( "select * from items where companyId="+companyId );
+            ResultSet rs = st.executeQuery( "select * from items WHERE companyId =" + this.companyId);
+            
+            String[] columns = {"Item Name", "Item Price"};
+            String[][] data = new String[8][2];
+            
+            int i = 0;
             while(rs.next()){
-                System.out.println(rs.getString(2));
+                data[i][0] = rs.getString("itemName");
+                data[i][1] = rs.getString("itemPrice");
+                i++;
             }
+            
+            itemsTable.setModel(new javax.swing.table.DefaultTableModel(data, columns) {
+                Class[] types = new Class [] {
+                    java.lang.String.class, java.lang.String.class, java.lang.String.class
+                };
+
+                @Override
+                public Class getColumnClass(int columnIndex) {
+                    return types [columnIndex];
+                }
+            });
             conn.close();
         }catch(ClassNotFoundException | SQLException e){
             System.out.println(e);
         }
+        
+        selectAction.addItem("Purchase");
+        selectAction.addItem("Sell");
     }
 
     /**
@@ -59,6 +92,16 @@ public class Dashboard extends javax.swing.JFrame {
         jMenuItem2 = new javax.swing.JMenuItem();
         tableHolder = new javax.swing.JScrollPane();
         itemsTable = new javax.swing.JTable();
+        panel1 = new java.awt.Panel();
+        addTitle = new java.awt.Label();
+        selectAction = new java.awt.Choice();
+        itemName = new java.awt.TextField();
+        itemDescription = new java.awt.TextArea();
+        unitPrice = new java.awt.TextField();
+        quantity = new java.awt.TextField();
+        resetBtn = new java.awt.Button();
+        submitBtn = new java.awt.Button();
+        successPopup = new javax.swing.JOptionPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         file = new javax.swing.JMenu();
         stockInMenu = new javax.swing.JMenu();
@@ -95,6 +138,78 @@ public class Dashboard extends javax.swing.JFrame {
         ));
         tableHolder.setViewportView(itemsTable);
 
+        addTitle.setAlignment(java.awt.Label.CENTER);
+        addTitle.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        addTitle.setName(""); // NOI18N
+        addTitle.setText("Add Purchase or Sale");
+
+        itemName.setText("Item name");
+
+        itemDescription.setText("Item description");
+
+        unitPrice.setText("Unit price");
+
+        quantity.setText("Quantity");
+        quantity.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                quantityActionPerformed(evt);
+            }
+        });
+
+        resetBtn.setLabel("Reset");
+
+        submitBtn.setBackground(new java.awt.Color(0, 180, 180));
+        submitBtn.setForeground(new java.awt.Color(255, 255, 255));
+        submitBtn.setLabel("Submit");
+        submitBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                submitBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
+        panel1.setLayout(panel1Layout);
+        panel1Layout.setHorizontalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(itemName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(itemDescription, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(unitPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(quantity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(selectAction, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(panel1Layout.createSequentialGroup()
+                        .addComponent(addTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 1, Short.MAX_VALUE))
+                    .addGroup(panel1Layout.createSequentialGroup()
+                        .addComponent(resetBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        panel1Layout.setVerticalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(addTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(selectAction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(itemName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(itemDescription, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(unitPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(quantity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(resetBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         file.setText("Items");
         jMenuBar1.add(file);
 
@@ -121,47 +236,70 @@ public class Dashboard extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(94, 94, 94)
-                .addComponent(tableHolder, javax.swing.GroupLayout.PREFERRED_SIZE, 1100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(86, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(302, 302, 302)
+                .addComponent(successPopup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tableHolder, javax.swing.GroupLayout.PREFERRED_SIZE, 1019, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tableHolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(264, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(tableHolder)
+                            .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(188, 188, 188)
+                        .addComponent(successPopup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(251, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void quantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quantityActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_quantityActionPerformed
+
+    private void submitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitBtnActionPerformed
+        if(selectAction.getSelectedItem().equals("Purchase")){
+            try{
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection conn;
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store", "root", "");
+                Statement st = conn.createStatement();
+                try{
+                    String query = "INSERT INTO `items`" + " (`itemName`, `itemPrice`, `companyId`, `userId`, `createdAt`)" + "VALUES('" + itemName.getText()+"','"+ unitPrice.getText() +"','"+ this.companyId +"','"+ this.userId +"','" + dtf.format(now) + "')";
+                    st.executeUpdate(query);
+                    fetchData();
+                    Component frame = null;
+                    JOptionPane.showMessageDialog(frame, "Successfully added a new item!", "A plain message", JOptionPane.PLAIN_MESSAGE);
+                    System.out.println("Successfully added a new record");
+                }catch(SQLException e){
+                    System.out.println(e);
+                }
+                conn.close();
+            }catch(ClassNotFoundException | SQLException e){
+                System.out.println(e);
+            }
+        }else{
+            
+        }
+    }//GEN-LAST:event_submitBtnActionPerformed
 
     
     private void ops(String c, String name){
         companyName.setText("Company: " + c);
         userName.setText(name);
         
-        itemsTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {"Burger", "12", "Techinika"},
-                {"Spaghetti", "12", "Techinika"},
-                {"Burger", "12", "Techinika"},
-                {"Spaghetti", "12", "Techinika"}
-            },
-            new String [] {
-                "Item Name", "User Id", "Company"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class
-            };
-
-            @Override
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
+        
+        
     }
     
     
@@ -170,10 +308,13 @@ public class Dashboard extends javax.swing.JFrame {
      */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private java.awt.Label addTitle;
     private javax.swing.JMenu companyName;
     private javax.swing.JMenu currentStockLink;
     private javax.swing.JMenu file;
     private javax.swing.JMenu inStockLink;
+    private java.awt.TextArea itemDescription;
+    private java.awt.TextField itemName;
     private javax.swing.JTable itemsTable;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
@@ -184,8 +325,15 @@ public class Dashboard extends javax.swing.JFrame {
     private java.awt.MenuBar menuBar1;
     private java.awt.MenuBar menuBar2;
     private javax.swing.JMenu outStockLink;
+    private java.awt.Panel panel1;
+    private java.awt.TextField quantity;
+    private java.awt.Button resetBtn;
+    private java.awt.Choice selectAction;
     private javax.swing.JMenu stockInMenu;
+    private java.awt.Button submitBtn;
+    private javax.swing.JOptionPane successPopup;
     private javax.swing.JScrollPane tableHolder;
+    private java.awt.TextField unitPrice;
     private javax.swing.JMenu userName;
     // End of variables declaration//GEN-END:variables
 }

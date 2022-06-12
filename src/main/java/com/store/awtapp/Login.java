@@ -149,7 +149,7 @@ public class Login extends javax.swing.JFrame {
                     if(emailField.getText().isEmpty() || passField.getText().isEmpty()){
                         msgLabel.setText("Credentials can not be empty!");
                     }else if(emailField.getText().equals(rs.getString(3)) && passField.getText().equals(rs.getString(4))){
-                        new Dashboard(rs.getString(7), selectCompany.getSelectedItem(), rs.getInt(5)).setVisible(true);
+                        new Dashboard(rs.getInt(1), rs.getString(7), selectCompany.getSelectedItem(), rs.getInt(5)).setVisible(true);
                         msgLabel.setText("");
                         emailField.setText("");
                         passField.setText("");
