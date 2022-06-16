@@ -516,7 +516,7 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="updateCompanyButton" min="-2" pref="98" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="deleteCompanyButton" min="-2" pref="86" max="-2" attributes="0"/>
+                                      <Component id="deleteSaleButton" min="-2" pref="86" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="cancelComapany" min="-2" pref="86" max="-2" attributes="0"/>
                                   </Group>
@@ -571,7 +571,7 @@
                                   <Component id="newSaleButton" alignment="3" min="-2" pref="36" max="-2" attributes="0"/>
                                   <Component id="cancelComapany" alignment="3" min="-2" pref="36" max="-2" attributes="0"/>
                                   <Component id="updateCompanyButton" alignment="3" min="-2" pref="36" max="-2" attributes="0"/>
-                                  <Component id="deleteCompanyButton" alignment="3" min="-2" pref="36" max="-2" attributes="0"/>
+                                  <Component id="deleteSaleButton" alignment="3" min="-2" pref="36" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <Component id="jScrollPane2" alignment="0" min="-2" pref="446" max="-2" attributes="0"/>
@@ -698,7 +698,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateCompanyButtonActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="deleteCompanyButton">
+            <Component class="javax.swing.JButton" name="deleteSaleButton">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="33" green="33" red="ff" type="rgb"/>
@@ -712,7 +712,7 @@
                 <Property name="text" type="java.lang.String" value="Delete"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deleteCompanyButtonActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deleteSaleButtonActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="cancelComapany">
