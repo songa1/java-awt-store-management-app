@@ -1,5 +1,6 @@
 package com.store.awtapp;
 
+import static java.lang.Integer.parseInt;
 import java.sql.*;
 import java.time.format.DateTimeFormatter;  
 import java.time.LocalDateTime;
@@ -157,14 +158,15 @@ public class Dashboard extends javax.swing.JFrame {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery( "select * from sales WHERE companyId =" + this.companyId);
             
-            String[] columns = {"Item", "Quantity", "Price/Unit", "Total Price"};
-            String[][] data = new String[20][4];
+            String[] columns = {"ID","Item", "Quantity", "Price/Unit", "Total Price"};
+            String[][] data = new String[20][5];
             int i = 0;
             while(rs.next()){
-                data[i][0] = items.get(rs.getInt(1));
-                data[i][1] = rs.getString(5);
-                data[i][2] = rs.getString(6);
-                data[i][3] = rs.getString(7);
+                data[i][0] = rs.getString(1);
+                data[i][1] = items.get(rs.getInt(1));
+                data[i][2] = rs.getString(5);
+                data[i][3] = rs.getString(6);
+                data[i][4] = rs.getString(7);
                 
                 i++;
             }
@@ -216,7 +218,7 @@ public class Dashboard extends javax.swing.JFrame {
         selectItemField = new javax.swing.JComboBox<>();
         newSaleButton = new javax.swing.JButton();
         updateCompanyButton = new javax.swing.JButton();
-        deleteCompanyButton = new javax.swing.JButton();
+        deleteSaleButton = new javax.swing.JButton();
         cancelComapany = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
@@ -539,13 +541,13 @@ public class Dashboard extends javax.swing.JFrame {
             }
         });
 
-        deleteCompanyButton.setBackground(new java.awt.Color(255, 51, 51));
-        deleteCompanyButton.setFont(new java.awt.Font("Lato", 0, 14)); // NOI18N
-        deleteCompanyButton.setForeground(new java.awt.Color(255, 255, 255));
-        deleteCompanyButton.setText("Delete");
-        deleteCompanyButton.addActionListener(new java.awt.event.ActionListener() {
+        deleteSaleButton.setBackground(new java.awt.Color(255, 51, 51));
+        deleteSaleButton.setFont(new java.awt.Font("Lato", 0, 14)); // NOI18N
+        deleteSaleButton.setForeground(new java.awt.Color(255, 255, 255));
+        deleteSaleButton.setText("Delete");
+        deleteSaleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteCompanyButtonActionPerformed(evt);
+                deleteSaleButtonActionPerformed(evt);
             }
         });
 
@@ -595,7 +597,7 @@ public class Dashboard extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(updateCompanyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(deleteCompanyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(deleteSaleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cancelComapany, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(totalPriceField)
@@ -642,7 +644,7 @@ public class Dashboard extends javax.swing.JFrame {
                             .addComponent(newSaleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(cancelComapany, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(updateCompanyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(deleteCompanyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(deleteSaleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(184, Short.MAX_VALUE))
         );
@@ -1006,13 +1008,14 @@ public class Dashboard extends javax.swing.JFrame {
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store", "root", "");
             Statement st = conn.createStatement();
             String query;
-            if(itemNameField.getText() == null || itemPriceField.getText().isEmpty()){
+            if(quantityField.getText() == null){
                 JOptionPane.showMessageDialog(this, "Some data is missing!");
             }else{
-                query = "INSERT INTO `items` (`itemId`, `userId`, `companyId`, `quantity`,`priceUnit`,`totalCost`,`createdAt`) VALUES ('" + itemsId.get(selectItemField.getSelectedItem()) + "','"+ this.userId +"','"+ this.companyId +"','"+ quantityField.getText() +"','"+ unitPriceField.getText() +"','"+ totalPriceField.getText() +"','"+ dtf.format(now) +"')";
+                int totalPrice = parseInt(quantityField.getText()) * parseInt(unitPriceField.getText());
+                query = "INSERT INTO `sales` (`itemId`, `userId`, `companyId`, `quantity`,`priceUnit`,`totalCost`,`createdAt`) VALUES ('" + itemsId.get(selectItemField.getSelectedItem()) + "','"+ this.userId +"','"+ this.companyId +"','"+ quantityField.getText() +"','"+ unitPriceField.getText() +"','"+ totalPrice +"','"+ dtf.format(now) +"')";
                 st.executeUpdate(query);
-                JOptionPane.showMessageDialog(this, itemNameField.getText() + " added successfully!");
-                fetchItems();
+                JOptionPane.showMessageDialog(this, "New sale added successfully!");
+                fetchSales();
                 itemNameField.setText("");
                 itemPriceField.setText("");
             }
@@ -1026,9 +1029,32 @@ public class Dashboard extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_updateCompanyButtonActionPerformed
 
-    private void deleteCompanyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteCompanyButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_deleteCompanyButtonActionPerformed
+    private void deleteSaleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteSaleButtonActionPerformed
+        int column = 0;
+        int row = salesTable.getSelectedRow();
+        String name = salesTable.getModel().getValueAt(row, column).toString();
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn;
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store", "root", "");
+            Statement st = conn.createStatement();
+            String query;
+            query = "DELETE FROM `items` WHERE `saleId` = ?";
+            
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, name);
+            
+            ps.executeUpdate();
+                    
+            JOptionPane.showMessageDialog(this, "Sale deleted successfully");
+            fetchSales();
+            conn.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_deleteSaleButtonActionPerformed
 
     private void cancelComapanyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelComapanyActionPerformed
         // TODO add your handling code here:
@@ -1107,8 +1133,8 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton cancelUser;
     private javax.swing.JPanel companyPanel;
     private javax.swing.JLabel declarationTitle;
-    private javax.swing.JButton deleteCompanyButton;
     private javax.swing.JButton deleteItemButton;
+    private javax.swing.JButton deleteSaleButton;
     private javax.swing.JButton deleteUserButton;
     private javax.swing.JTextField emailField;
     private javax.swing.JButton getStartedButton;
