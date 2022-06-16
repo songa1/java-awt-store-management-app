@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 public class Dashboard extends javax.swing.JFrame {
     
     HashMap<String, Integer> roles = new HashMap<>();
+    HashMap<Integer, String> rolesNames = new HashMap<>();
     HashMap<String, Integer> companies = new HashMap<>();
     HashMap<String, Integer> users = new HashMap<>();
     HashMap<Integer, String> items = new HashMap<>();
@@ -53,9 +54,9 @@ public class Dashboard extends javax.swing.JFrame {
         this.companyId = companyId;
         this.userId = idUser;
         
-        // Fetching a list of users
-        fetchUsers();
+        // Fetching
         fetchRoles();
+        fetchUsers();
         fetchCompanies();
         fetchItems();
         fetchSales();
@@ -70,14 +71,14 @@ public class Dashboard extends javax.swing.JFrame {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery( "select * from users WHERE companyId =" + this.companyId);
             
-            String[] columns = {"Name", "Email", "Company", "Role"};
-            String[][] data = new String[20][4];
+            String[] columns = {"Name", "Email", "Role"};
+            String[][] data = new String[20][3];
             int i = 0;
             while(rs.next()){
+                String roleName = rolesNames.get(rs.getInt(1));
                 data[i][0] = rs.getString("userFullName");
                 data[i][1] = rs.getString("userEmail");
-                data[i][2] = rs.getString("companyId");
-                data[i][3] = rs.getString("roleId");
+                data[i][2] = roleName;
                 users.put(rs.getString(2), rs.getInt(1));
                 i++;
             }
@@ -98,6 +99,7 @@ public class Dashboard extends javax.swing.JFrame {
             while(rs.next()){
                 selectUserRole.addItem(rs.getString(2));
                 roles.put(rs.getString(2), rs.getInt(1));
+                rolesNames.put(rs.getInt(1), rs.getString(2));
             }
         }catch(ClassNotFoundException | SQLException e){
             JOptionPane.showMessageDialog(this, e);
@@ -305,7 +307,7 @@ public class Dashboard extends javax.swing.JFrame {
                 .addComponent(goToCompanies, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(goToUsers)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 1209, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 1207, Short.MAX_VALUE)
                 .addGroup(topNavigationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(loggedInUser, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(userCompany, javax.swing.GroupLayout.Alignment.TRAILING))
@@ -426,35 +428,37 @@ public class Dashboard extends javax.swing.JFrame {
             usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(usersPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(usersTableTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1297, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
                 .addGroup(usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(usersPanelLayout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 902, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(50, 50, 50)
                         .addGroup(usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(usersPanelLayout.createSequentialGroup()
+                                    .addComponent(addNewUserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(updateUserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(deleteUserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(cancelUser, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(passwordField)
+                                .addComponent(namesField)
+                                .addComponent(selectUserCompany, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(selectUserRole, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(emailField)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(usersPanelLayout.createSequentialGroup()
-                                .addComponent(addNewUserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(updateUserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(deleteUserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cancelUser, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(passwordField)
-                            .addComponent(namesField)
-                            .addComponent(selectUserCompany, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(selectUserRole, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(emailField)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(11, 11, 11))
+                                .addGroup(usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel8))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 237, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(374, 374, 374))
                     .addGroup(usersPanelLayout.createSequentialGroup()
-                        .addGroup(usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8))
+                        .addComponent(usersTableTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 1297, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         usersPanelLayout.setVerticalGroup(
@@ -646,7 +650,7 @@ public class Dashboard extends javax.swing.JFrame {
                             .addComponent(updateCompanyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(deleteSaleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(184, Short.MAX_VALUE))
+                .addContainerGap(194, Short.MAX_VALUE))
         );
 
         mainPane.add(companyPanel);
@@ -776,7 +780,7 @@ public class Dashboard extends javax.swing.JFrame {
                             .addComponent(addNewUserButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(deleteItemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(184, Short.MAX_VALUE))
+                .addContainerGap(194, Short.MAX_VALUE))
         );
 
         mainPane.add(itemsPanel);
@@ -852,7 +856,7 @@ public class Dashboard extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(homePagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(listOfItemsWeHave, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(welcomeMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 795, Short.MAX_VALUE)
+                    .addComponent(welcomeMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 769, Short.MAX_VALUE)
                     .addGroup(homePagePanelLayout.createSequentialGroup()
                         .addComponent(declarationTitle)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -886,13 +890,13 @@ public class Dashboard extends javax.swing.JFrame {
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(mainPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(mainPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1685, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(topNavigation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(802, Short.MAX_VALUE))
+                .addContainerGap(812, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addGap(95, 95, 95)
